@@ -45,15 +45,23 @@ def get_tenantid(function):
 
             # Extract the tenant_id from the decoded token
             tenant_id = decoded.get('custom:tenant_id')
+            tenant_name = decoded.get('custom:tenant_name')
+            tenant_tier = decoded.get('custom:tenant_tier')
+            user_role = decoded.get('custom:user_role')
 
             if not tenant_id:
                 return {'message': 'Tenant ID not found in JWT token'}, 401
 
-            print(f"Tenant ID: {tenant_id}")
+            print(f"Tenant ID: {tenant_id}, Tenant Name: {tenant_name}, Tenant Tier: {tenant_tier}, User Role: {user_role}", )
             kwargs['tenant_id'] = tenant_id
+            kwargs['tenant_name'] = tenant_name
+            kwargs['tenant_tier'] = tenant_tier
+            kwargs['user_role'] = user_role
             return function(*args, **kwargs)
 
         except JoseError as e:
             return {'message': f'Invalid JWT token: {str(e)}'}, 401
 
     return decorated_function
+
+

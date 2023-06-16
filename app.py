@@ -4,9 +4,13 @@ from flask import Flask, request, jsonify
 from flask_restful import Resource, Api, reqparse
 from auth import get_tenantid
 import psycopg2
+from flask_cors import CORS
+# from flask_cors import cross_origin
 
 app = Flask(__name__)
+CORS(app, resources={r'/*': {'origins': '*', 'methods': ['POST', 'OPTIONS', 'GET'], 'headers': ['Content-Type', 'Authorization']}})
 api = Api(app)
+
 
 load_dotenv()
 
@@ -69,11 +73,16 @@ def insert_tenant(conn, tenant_data):
         return tenant_data['tenant_id'], "Tenant created"
 
 class RegisterTenantUser(Resource):
+    # @cross_origin()
     @get_tenantid
-    def post(self, tenant_id):
+    def post(self, tenant_id, **kwargs):
         data = request.get_json()
 
+        print("here1", kwargs.get('tenant_name'))
+        print("here1", kwargs.get('tenant_tier'))
+        print("here1", kwargs.get('user_role'))
         print("here2", data)
+        
         user_data = {
             'tenant_name': data.get('tenant_name'),
             'role': data.get('role'),
@@ -99,3 +108,6 @@ class RegisterTenantUser(Resource):
 
 
 api.add_resource(RegisterTenantUser, '/api/users')
+
+if __name__ == '__main__':
+    app.run(debug=True, port=8081)
